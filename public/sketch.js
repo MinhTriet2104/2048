@@ -1,10 +1,11 @@
 const size = 100;
-const grid = [
+let grid = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
   [0, 0, 0, 0],
   [0, 0, 0, 0]
 ];
+const undoArray = [];
 const gameColor = {
   2: { color: "#776E65", background: "#EEE4DA" },
   4: { color: "#776E65", background: "#EDE0C8" },
@@ -49,32 +50,41 @@ function create() {
 
 function keyPressed() {
   if (keyCode === LEFT_ARROW) {
-    moveLeft();
-    render();
-    addNumber();
-    render();
+    if (moveLeft()) {
+      undoArray.push(grid);
+      render();
+      addNumber();
+      render();
+    }
   }
   if (keyCode === RIGHT_ARROW) {
-    moveRight();
-    render();
-    addNumber();
-    render();
+    if (moveRight()) {
+      undoArray.push(grid);
+      render();
+      addNumber();
+      render();
+    }
   }
   if (keyCode === UP_ARROW) {
-    moveUp();
-    render();
-    addNumber();
-    render();
+    if (moveUp()) {
+      undoArray.push(grid);
+      render();
+      addNumber();
+      render();
+    }
   }
   if (keyCode === DOWN_ARROW) {
-    moveDown();
-    render();
-    addNumber();
-    render();
+    if (moveDown()) {
+      undoArray.push(grid);
+      render();
+      addNumber();
+      render();
+    }
   }
 }
 
 function moveDown() {
+  let move = false;
   for (let j = 0; j < 4; j++) {
     let arr = [];
     for (let i = 0; i < 4; i++) {
@@ -88,25 +98,35 @@ function moveDown() {
       arr = zeros.concat(arr);
     }
     for (let i = 0; i < 4; i++) {
-      grid[i][j].number = arr[i];
+      if (grid[i][j].number !== arr[i]) {
+        grid[i][j].number = arr[i];
+        move = true;
+      }
     }
   }
 
   for (let j = 0; j < 4; j++) {
     for (let i = 3; i >= 1; i--) {
-      if (grid[i][j].number === grid[i - 1][j].number) {
+      if (
+        grid[i][j].number !== 0 &&
+        grid[i][j].number === grid[i - 1][j].number
+      ) {
         grid[i][j].number *= 2;
         grid[i - 1][j].number = 0;
+        move = true;
       }
       if (grid[i][j].number === 0 && grid[i - 1][j].number !== 0) {
         grid[i][j].number = grid[i - 1][j].number;
         grid[i - 1][j].number = 0;
+        move = true;
       }
     }
   }
+  return move;
 }
 
 function moveUp() {
+  let move = false;
   for (let j = 0; j < 4; j++) {
     let arr = [];
     for (let i = 0; i < 4; i++) {
@@ -120,25 +140,35 @@ function moveUp() {
       arr = arr.concat(zeros);
     }
     for (let i = 0; i < 4; i++) {
-      grid[i][j].number = arr[i];
+      if (grid[i][j].number !== arr[i]) {
+        grid[i][j].number = arr[i];
+        move = true;
+      }
     }
   }
 
   for (let j = 0; j < 4; j++) {
     for (let i = 0; i < 3; i++) {
-      if (grid[i][j].number === grid[i + 1][j].number) {
+      if (
+        grid[i][j].number !== 0 &&
+        grid[i][j].number === grid[i + 1][j].number
+      ) {
         grid[i][j].number *= 2;
         grid[i + 1][j].number = 0;
+        move = true;
       }
       if (grid[i][j].number === 0 && grid[i + 1][j].number !== 0) {
         grid[i][j].number = grid[i + 1][j].number;
         grid[i + 1][j].number = 0;
+        move = true;
       }
     }
   }
+  return move;
 }
 
 function moveRight() {
+  let move = false;
   for (let i = 0; i < 4; i++) {
     let arr = [];
     grid[i].forEach(row => {
@@ -152,25 +182,35 @@ function moveRight() {
       arr = zeros.concat(arr);
     }
     for (let j = 0; j < 4; j++) {
-      grid[i][j].number = arr[j];
+      if (grid[i][j].number !== arr[j]) {
+        grid[i][j].number = arr[j];
+        move = true;
+      }
     }
   }
 
   for (let i = 0; i < 4; i++) {
     for (let j = 3; j >= 1; j--) {
-      if (grid[i][j].number === grid[i][j - 1].number) {
+      if (
+        grid[i][j].number !== 0 &&
+        grid[i][j].number === grid[i][j - 1].number
+      ) {
         grid[i][j].number *= 2;
         grid[i][j - 1].number = 0;
+        move = true;
       }
       if (grid[i][j].number === 0 && grid[i][j - 1].number !== 0) {
         grid[i][j].number = grid[i][j - 1].number;
         grid[i][j - 1].number = 0;
+        move = true;
       }
     }
   }
+  return move;
 }
 
 function moveLeft() {
+  let move = false;
   for (let i = 0; i < 4; i++) {
     let arr = [];
     grid[i].forEach(row => {
@@ -184,22 +224,31 @@ function moveLeft() {
       arr = arr.concat(zeros);
     }
     for (let j = 0; j < 4; j++) {
-      grid[i][j].number = arr[j];
+      if (grid[i][j].number !== arr[j]) {
+        grid[i][j].number = arr[j];
+        move = true;
+      }
     }
   }
 
   for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 3; j++) {
-      if (grid[i][j].number === grid[i][j + 1].number) {
+      if (
+        grid[i][j].number !== 0 &&
+        grid[i][j].number === grid[i][j + 1].number
+      ) {
         grid[i][j].number *= 2;
         grid[i][j + 1].number = 0;
+        move = true;
       }
       if (grid[i][j].number === 0 && grid[i][j + 1].number !== 0) {
         grid[i][j].number = grid[i][j + 1].number;
         grid[i][j + 1].number = 0;
+        move = true;
       }
     }
   }
+  return move;
 }
 
 function addNumber() {
@@ -236,4 +285,15 @@ function render() {
       }
     }
   }
+}
+
+function swap(grid1, grid2) {
+  const temp = grid1.number;
+  grid1.number = grid2.number;
+  grid2.number = temp;
+  render();
+}
+
+function undo() {
+  grid = undoArray[undoArray.length - 1 - 1];
 }
